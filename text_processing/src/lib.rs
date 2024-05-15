@@ -1,7 +1,3 @@
-use text_processing_helpers::perform_operations;
-
-
-
 pub mod parse_args {
 
     pub fn perform_args_checks(args: &[String]) -> Result<(),String>{
@@ -268,13 +264,13 @@ mod text_processing_helpers{
 }
 
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
 
-    // #[test]
-    // fn it_works() {
-    //     let result = add(2, 2);
-    //     assert_eq!(result, 4);
-    // }
-}
+//     // #[test]
+//     // fn it_works() {
+//     //     let result = add(2, 2);
+//     //     assert_eq!(result, 4);
+//     // }
+// }
