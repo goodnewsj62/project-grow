@@ -1,4 +1,4 @@
-pub mod parse_args {
+pub mod validate_args {
 
     pub fn perform_args_checks(args: &[String]) -> Result<(),String>{
         let validators_ =  [validators::validate_type,  validators::validate_operations,  validators::validate_other_options];
@@ -47,11 +47,11 @@ pub mod parse_args {
             }
             
 
-            if !next_pos_value.unwrap().eq("f") ||  !next_pos_value.unwrap().eq("t"){
+            if !next_pos_value.unwrap().trim().eq("f") ||  !next_pos_value.unwrap().trim().eq("t"){
                 return Err("Invalid file type. only f (file) and t (text) are accepted".to_string());
             }
 
-            if next_pos_value.unwrap().eq("f"){
+            if next_pos_value.unwrap().trim().eq("f"){
                 if !Path::new(type_value.unwrap().as_str()).is_file(){
                     return Err("File path does not exists or is not a file".to_string());
                 }
@@ -120,26 +120,29 @@ pub mod parse_args {
     
 }
 
+use text_processing_helpers::perform_operations;
+
 pub fn parse_args(input_args:  &mut[String]){
+
     
-    let (mut file_text,  mut args) =  text_processing_helpers::get_text_string(input_args);
-    text_processing_helpers::perform_operations::init(&mut file_text, &mut args);
+    let (mut file_text,  args) =  text_processing_helpers::get_text_string(input_args);
+    
     
 
 
-    while let Some(arg) =  args.iter().next(){
+    while let Some((pos,  arg)) =  args.iter().enumerate().next(){
         match arg.as_str() {
             "--op" =>{
-                
+                perform_operations::perform_operations(&mut file_text,  pos,  &args);
             }
             "--mt"=>{
-
+                perform_operations::match_text(&file_text, pos, &args);
             }
             "--rt" =>{
-
+                perform_operations::replace_text(&mut file_text, pos, &args);
             }
             "--wf" =>{
-
+                perform_operations::word_frequency(&file_text, pos, &args)
             }
             _ => {
 
@@ -160,7 +163,7 @@ mod text_processing_helpers{
         let transformed_args: Vec<String> =  args.iter().enumerate().filter(|(n, _)| *n != pos && *n != pos + 1 &&  *n != pos + 2).map(|(_, val)| format!("{}", val)).collect();
 
         // next arg which is f for file and t for text
-        if args.get(pos + 1).unwrap().eq("t") {
+        if args.get(pos + 1).unwrap().trim().eq("t") {
             return  (args.get(pos + 1).unwrap().clone(), transformed_args);
         }
 
@@ -180,20 +183,18 @@ mod text_processing_helpers{
     }
 
 
- 
     //// --mt: to match a text [-i for case insensitive match]
     //// --rt:  replace text [-i  for case insensitive]
     //// --wf:  word frequency for a particular word
     pub mod perform_operations {
         use std::collections::HashMap;
 
-        pub fn init(text: &mut String,args: &mut Vec<String>){
-            let pos =  args.iter().position(|f| f.trim().eq("--op") ).unwrap();
+        pub fn perform_operations(text: &mut String,pos: usize, args: &Vec<String>){
 
             for val in args.get(pos +  1).unwrap().chars(){
-                if val.to_string().eq("-"){continue;}
+                if val.to_string().trim().eq("-"){continue;}
 
-                match &val.to_string()[..] {
+                match &val.to_string().trim()[..] {
                     "w" => println!("number of words - {}" , counter(text, "space")),
                     "c" => println!("number of characters - {}" , counter(text, "char")),
                     "n" => println!("number of lines - {}" , counter(text, "char")),
@@ -207,10 +208,6 @@ mod text_processing_helpers{
                     }
                 }
             }
-
-            args.remove(pos);
-            args.remove(pos + 1);
-
         }
 
         fn counter(string:  &str, delimiter_name: &str ) -> usize{
@@ -259,6 +256,27 @@ mod text_processing_helpers{
             string.clear();
             string.push_str(&rev_string);
             string
+        }
+
+        pub fn match_text(string:  &str, pos: usize,  args: &Vec<String>){
+            for (n, line) in string.lines().enumerate() {
+                if line.trim().contains(args.get(pos + 1).unwrap()){
+                    println!("{}: {}",n+1,line);
+                }
+            }
+        }
+
+        pub fn replace_text(string:  &mut String, pos: usize, args: &Vec<String>){
+            let replaced =    string.replace(string.as_str(), args.get(pos + 1).unwrap());
+            string.clear();
+            string.push_str(&replaced);
+
+        }
+
+        pub fn word_frequency(string:  &str, pos: usize, args: &Vec<String>){
+            let result_ =  get_word_frequency(string);
+            let word =  args.get(pos + 1).unwrap();
+            println!("Frequency of the word {} in text - {}",word,  result_.get(word).unwrap_or(&0));
         }
     }
 }

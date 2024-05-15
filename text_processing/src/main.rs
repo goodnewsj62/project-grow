@@ -1,6 +1,6 @@
 use std::process;
-use std::{env, ffi::OsString};
-use text_processing::parse_args;
+use std::env;
+use text_processing::{validate_args, self};
 
 fn main() {
     //// Simple text processing in rust
@@ -31,14 +31,16 @@ fn main() {
         handle each case and print the result to the terminal
     */
 
-    let args: Vec<String> =  env::args().skip(1).collect();
+    let mut args: Vec<String> =  env::args().skip(1).collect();
 
-    if let Err(val) = parse_args::perform_args_checks(&args){
+    if let Err(val) = validate_args::perform_args_checks(&args){
         eprint!("{:?}",val);
         process::exit(1);
     }
-    // let mut input_args =  [String::new(),  String::new()];
-    // parse_args(&input_args);
+
+
+    text_processing::parse_args(&mut args);
+    
     
 
 }
