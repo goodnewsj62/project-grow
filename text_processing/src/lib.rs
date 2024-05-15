@@ -47,7 +47,7 @@ pub mod validate_args {
             }
             
 
-            if !next_pos_value.unwrap().trim().eq("f") ||  !next_pos_value.unwrap().trim().eq("t"){
+            if !next_pos_value.unwrap().trim().eq("f") &&  !next_pos_value.unwrap().trim().eq("t"){
                 return Err("Invalid file type. only f (file) and t (text) are accepted".to_string());
             }
 
@@ -130,7 +130,8 @@ pub fn parse_args(input_args:  &mut[String]){
     
 
 
-    while let Some((pos,  arg)) =  args.iter().enumerate().next(){
+    for (pos,arg) in args.iter().enumerate(){
+       
         match arg.as_str() {
             "--op" =>{
                 perform_operations::perform_operations(&mut file_text,  pos,  &args);
@@ -149,6 +150,8 @@ pub fn parse_args(input_args:  &mut[String]){
             }
         }
     }
+
+    print!("\n\nCURRENT TEXT CONTENT \n\n{}\n", file_text)
 }
 
 
@@ -197,7 +200,7 @@ mod text_processing_helpers{
                 match &val.to_string().trim()[..] {
                     "w" => println!("number of words - {}" , counter(text, "space")),
                     "c" => println!("number of characters - {}" , counter(text, "char")),
-                    "n" => println!("number of lines - {}" , counter(text, "char")),
+                    "n" => println!("number of lines - {}" , counter(text, "line")),
                     "r" => {
                         let _  =  reverse_text(text);
                     },
@@ -216,11 +219,12 @@ mod text_processing_helpers{
                 ("space",  b' '),
             ]);
 
+
             if !store.contains_key(&delimiter_name){
                     return string.trim().len();
             }
 
-            return string.trim().bytes().fold(0, |acc, e| {
+            return string.trim().bytes().fold(1, |acc, e| {
                     if e == *store.get(delimiter_name).unwrap(){
                         return acc +  1;
                     }
@@ -231,8 +235,8 @@ mod text_processing_helpers{
 
         fn get_word_frequency(string:  &str) -> HashMap<String,  u32> {
             let mut store  =  HashMap::new();
-            string.trim().split(' ').for_each(|key| {
-                *store.entry(key.to_string()).or_insert(1) += 1;
+            string.lines().for_each(|line| {
+                line.split(' ').for_each(|key|{*store.entry(key.to_string()).or_insert(1) += 1;});
             });
 
             store
