@@ -1,12 +1,14 @@
 fn main() {
-    println!("Hello, world!");
+    // here we used backtracking to solve the combination problem (nCr)
+    // the algorithm  backtracks once it finds that r == stored value length
+    // and leaves any out those that does not meet the criteria
 
     let intput =  vec![1,2,3,4];
 
     let mut result =  Vec::new();
     let mut store =  Vec::new();
 
-    let output =  combination(&intput, 2, &mut result, &mut store, 0);
+    let output =  combination(&intput, 3, &mut result, &mut store, 0);
 
     println!("{:#?}",  output);
 
@@ -27,7 +29,6 @@ pub fn combination<'a>(set:  &'a [u8],k: u8 , result:  &'a mut Vec<Vec<u8>>,stor
             result.push(store.clone());
         
         }else{
-            println!("pass");
             combination(set, k, result, store, i + 1);
         }
 
