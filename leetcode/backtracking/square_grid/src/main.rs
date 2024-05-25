@@ -1,7 +1,7 @@
 fn main() {
     let grid =  vec![vec![0,1,2],  vec![3, 4,5],  vec![6,7,8]];
     let mut store: Vec<usize> =  Vec::new();
-    find_all_paths(&grid, &mut store, 4, 0, 0);
+    find_all_paths(&grid, &mut store, 8, 0, 0);
 }
 
 
